@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import fnmatch
+import os
 from dataclasses import dataclass
 
 from huggingface_hub import HfFileSystem
@@ -102,13 +103,15 @@ async def stream_repo_to_s3(
     concurrency: int = 4,
     chunk_size_mb: int = 8,
     dry_run: bool = False,
+    endpoint_url: str | None = None,
 ) -> None:
     """Stream entire repo to S3 with concurrency."""
     include_patterns = include_patterns or ["*"]
     exclude_patterns = exclude_patterns or []
 
     hf = HfFileSystem()
-    s3 = s3fs.S3FileSystem()
+    endpoint = endpoint_url or os.environ.get("AWS_ENDPOINT_URL")
+    s3 = s3fs.S3FileSystem(endpoint_url=endpoint)
 
     files = list_repo_files(
         hf, repo_id, revision, repo_type, s3_dest, include_patterns, exclude_patterns

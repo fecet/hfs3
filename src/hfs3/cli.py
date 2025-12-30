@@ -54,6 +54,10 @@ def main(
         bool,
         typer.Option("--dry-run", "-n", help="List files without transferring"),
     ] = False,
+    endpoint_url: Annotated[
+        Optional[str],
+        typer.Option("--endpoint-url", help="S3 endpoint URL (or set AWS_ENDPOINT_URL)"),
+    ] = None,
 ) -> None:
     """Stream a HuggingFace repository to S3."""
     if not s3_dest.startswith("s3://"):
@@ -73,6 +77,7 @@ def main(
             concurrency=concurrency,
             chunk_size_mb=chunk_size,
             dry_run=dry_run,
+            endpoint_url=endpoint_url,
         )
     )
 
