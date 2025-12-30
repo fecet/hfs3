@@ -15,3 +15,7 @@ hatchling = "*"
 
 [pypi-dependencies]
 hfs3 = { path = ".", editable = true }
+
+[activation.env]
+HF_XET_HIGH_PERFORMANCE = "1"
+HF_XET_NUM_CONCURRENT_RANGE_GETS = "32"
