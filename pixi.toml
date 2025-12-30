@@ -1,0 +1,12 @@
+[workspace]
+authors = ["fecet <xiezej@gmail.com>"]
+channels = ["https://repo.prefix.dev/meta-forge", "conda-forge"]
+name = "hfs3"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+huggingface_hub = "*"
+s3fs = "*"
