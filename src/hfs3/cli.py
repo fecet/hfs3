@@ -58,6 +58,10 @@ def main(
         Optional[str],
         typer.Option("--endpoint-url", help="S3 endpoint URL (or set AWS_ENDPOINT_URL)"),
     ] = None,
+    hf_token: Annotated[
+        Optional[str],
+        typer.Option("--hf-token", help="HuggingFace token for private repos (or set HF_TOKEN)"),
+    ] = None,
 ) -> None:
     if not s3_dest.startswith("s3://"):
         raise typer.BadParameter("S3 destination must start with 's3://'")
@@ -74,6 +78,7 @@ def main(
             chunk_size_mb=chunk_size,
             dry_run=dry_run,
             endpoint_url=endpoint_url,
+            hf_token=hf_token,
         )
     )
 

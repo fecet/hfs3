@@ -6,7 +6,8 @@ authors = [{ name = "fecet", email = "xiezej@gmail.com" }]
 requires-python = ">=3.10"
 dependencies = [
     "huggingface_hub",
-    "s3fs",
+    "aiohttp",
+    "aiobotocore",
     "rich",
     "typer",
     "tenacity",
