@@ -9,6 +9,7 @@ dependencies = [
     "s3fs",
     "rich",
     "typer",
+    "tenacity",
 ]
 
 [project.scripts]
