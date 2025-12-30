@@ -6,33 +6,31 @@ import asyncio
 import fnmatch
 import os
 from dataclasses import dataclass
+from typing import Literal
 
 from huggingface_hub import HfFileSystem
 import s3fs
 
 from .progress import ProgressTracker
 
+RepoType = Literal["model", "dataset", "space"]
+
+_REPO_PREFIXES: dict[RepoType, str] = {"dataset": "datasets", "space": "spaces", "model": ""}
+
 
 @dataclass
 class FileInfo:
-    """Metadata for a file to transfer."""
-
     hf_path: str
     s3_key: str
     size: int
 
 
-def get_hf_prefix(repo_id: str, repo_type: str, revision: str) -> str:
-    """Build HF path prefix based on repo_type."""
-    if repo_type == "dataset":
-        return f"datasets/{repo_id}@{revision}"
-    elif repo_type == "space":
-        return f"spaces/{repo_id}@{revision}"
-    return f"{repo_id}@{revision}"
+def get_hf_prefix(repo_id: str, repo_type: RepoType, revision: str) -> str:
+    prefix = _REPO_PREFIXES[repo_type]
+    return f"{prefix}/{repo_id}@{revision}" if prefix else f"{repo_id}@{revision}"
 
 
 def matches_patterns(filename: str, patterns: list[str]) -> bool:
-    """Check if filename matches any of the glob patterns."""
     return any(fnmatch.fnmatch(filename, p) for p in patterns)
 
 
@@ -40,12 +38,11 @@ def list_repo_files(
     hf: HfFileSystem,
     repo_id: str,
     revision: str,
-    repo_type: str,
+    repo_type: RepoType,
     s3_dest: str,
     include_patterns: list[str],
     exclude_patterns: list[str],
 ) -> list[FileInfo]:
-    """List files in HF repo matching patterns."""
     prefix = get_hf_prefix(repo_id, repo_type, revision)
     files: list[FileInfo] = []
 
@@ -81,7 +78,6 @@ def stream_single_file(
     chunk_size: int,
     progress: ProgressTracker | None,
 ) -> None:
-    """Stream a single file from HF to S3."""
     with hf.open(file_info.hf_path, "rb") as src:
         with s3.open(file_info.s3_key, "wb") as dst:
             while chunk := src.read(chunk_size):
@@ -97,7 +93,7 @@ async def stream_repo_to_s3(
     repo_id: str,
     s3_dest: str,
     revision: str = "main",
-    repo_type: str = "model",
+    repo_type: RepoType = "model",
     include_patterns: list[str] | None = None,
     exclude_patterns: list[str] | None = None,
     concurrency: int = 4,
@@ -105,7 +101,6 @@ async def stream_repo_to_s3(
     dry_run: bool = False,
     endpoint_url: str | None = None,
 ) -> None:
-    """Stream entire repo to S3 with concurrency."""
     include_patterns = include_patterns or ["*"]
     exclude_patterns = exclude_patterns or []
 

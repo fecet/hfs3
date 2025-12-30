@@ -7,7 +7,7 @@ from typing import Annotated, Optional
 
 import typer
 
-from .transfer import stream_repo_to_s3
+from .transfer import RepoType, stream_repo_to_s3
 
 app = typer.Typer(
     name="hfs3",
@@ -31,8 +31,8 @@ def main(
         typer.Option("--revision", "-r", help="Git revision (branch/tag/commit)"),
     ] = "main",
     repo_type: Annotated[
-        str,
-        typer.Option("--repo-type", "-t", help="Repository type: model/dataset/space"),
+        RepoType,
+        typer.Option("--repo-type", "-t", help="Repository type"),
     ] = "model",
     include: Annotated[
         Optional[list[str]],
@@ -59,12 +59,8 @@ def main(
         typer.Option("--endpoint-url", help="S3 endpoint URL (or set AWS_ENDPOINT_URL)"),
     ] = None,
 ) -> None:
-    """Stream a HuggingFace repository to S3."""
     if not s3_dest.startswith("s3://"):
         raise typer.BadParameter("S3 destination must start with 's3://'")
-
-    if repo_type not in ("model", "dataset", "space"):
-        raise typer.BadParameter("repo-type must be one of: model, dataset, space")
 
     asyncio.run(
         stream_repo_to_s3(

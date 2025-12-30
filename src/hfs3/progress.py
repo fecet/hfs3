@@ -18,8 +18,6 @@ from rich.progress import (
 
 @dataclass
 class ProgressTracker:
-    """Track and display transfer progress for multiple files."""
-
     total_size: int
     progress: Progress = field(init=False)
     overall_task: TaskID = field(init=False)
@@ -46,7 +44,6 @@ class ProgressTracker:
         self.progress.__exit__(*args)
 
     def add_file(self, file_path: str, size: int) -> None:
-        """Add a file task to track."""
         with self._lock:
             short_name = file_path.split("/")[-1]
             if len(short_name) > 30:
@@ -55,7 +52,6 @@ class ProgressTracker:
             self.file_tasks[file_path] = task_id
 
     def update(self, file_path: str, bytes_transferred: int) -> None:
-        """Update progress for a specific file."""
         with self._lock:
             if file_path in self.file_tasks:
                 self.progress.update(
@@ -64,7 +60,6 @@ class ProgressTracker:
             self.progress.update(self.overall_task, advance=bytes_transferred)
 
     def complete_file(self, file_path: str) -> None:
-        """Mark a file as completed and remove from display."""
         with self._lock:
             if file_path in self.file_tasks:
                 self.progress.remove_task(self.file_tasks[file_path])
