@@ -5,8 +5,13 @@ name = "hfs3"
 platforms = ["linux-64"]
 version = "0.1.0"
 
+[activation.env]
+
 [tasks]
+hfs3 = "python -m hfs3.cli"
 
 [dependencies]
 huggingface_hub = "*"
 s3fs = "*"
+rich = "*"
+typer = "*"
