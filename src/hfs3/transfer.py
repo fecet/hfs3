@@ -46,12 +46,8 @@ def list_repo_files(
     prefix = get_hf_prefix(repo_id, repo_type, revision)
     files: list[FileInfo] = []
 
-    for info in hf.ls(prefix, detail=True):
-        if info["type"] != "file":
-            continue
-
-        full_path = info["name"]
-        relative_path = full_path.split("/", 1)[1] if "/" in full_path else full_path
+    for full_path, info in hf.find(prefix, detail=True).items():
+        relative_path = full_path.removeprefix(f"{prefix}/")
         filename = relative_path.split("/")[-1]
 
         if not matches_patterns(filename, include_patterns):
